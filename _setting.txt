@@ -1,3 +1,3 @@
-base_dir = /Users/igwanghyeon/Library/Mobile Documents/com~apple~CloudDocs/KH's Container/Kaboratory/digger_finance/
-data_dir = /Users/igwanghyeon/Library/Mobile Documents/com~apple~CloudDocs/KH's Container/Kaboratory/digger_finance/data/
-strategy_sample_dir = /Users/igwanghyeon/Library/Mobile Documents/com~apple~CloudDocs/KH's Container/Kaboratory/digger_finance/strategy_sample/
+base_dir = /Users/sinjiyoung/Documents/
+data_dir = /Users/sinjiyoung/Documents/django-finance/elaborate_backtesting/
+strategy_sample_dir = /Users/sinjiyoung/Documents/django-finance/elaborate_backtesting/strategy_sample/
