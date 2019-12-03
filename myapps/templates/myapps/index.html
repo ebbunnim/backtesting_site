@@ -1,0 +1,8 @@
+<form action="" method="post">
+    {% csrf_token %}
+    <label for="strategy">Choose Strategy: </label>
+    <input id="strategy" type="text" name="strategy_field">
+    <input type="submit" value="OK">
+</form>
+
+<img src="data:image/png;base64,{{image_base64}}" alt="No image" width=500 height=auto />

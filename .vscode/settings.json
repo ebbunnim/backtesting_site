@@ -1,0 +1,12 @@
+{
+    "python.pythonPath": "/Users/sinjiyoung/.pyenv/versions/my_venv/bin/python",
+    "files.associations": {
+        "**/*.html": "django-html",
+        "**/templates/*": "django-txt",
+        "**/requirements{/**,*}.{txt,in}": "pip-requirements"
+    },
+    "emmet.includeLanguages": {
+        "django-html": "html"
+    },
+
+}
