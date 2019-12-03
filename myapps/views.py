@@ -48,6 +48,7 @@ def index(request):
             
     # ========================= Backtesting =========================
     def backtest(port_weight, deposit, buy='open', sell='open', asset_name='stock', fee_rate=0.00015, tax_rate=0.003):
+        # input request >> change default
         if request.method == "POST":
             fee_rate = float(request.POST['fee_rate'])
             tax_rate = float(request.POST['tax_rate'])
@@ -102,6 +103,9 @@ def index(request):
 
         context = {
             'image_base64' : image_base64,
+            'strategy_field' : request.POST['strategy_field'],
+            'fee_rate': float(request.POST['fee_rate']),
+            'tax_rate': float(request.POST['tax_rate']),
         }
     else:
         context = {

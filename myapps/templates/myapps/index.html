@@ -1,26 +1,115 @@
-<form action="" method="post">
-    {% csrf_token %}
-    <label for="strategy_field">Choose Strategy: </label>
+{% load static %}
 
-    {% comment %} strategy select {% endcomment %}
-    <select name="strategy_field">
-        <option value=""></option>
-        <option value="daily_strategy01">daily_strategy01</option>
-        <option value="daily_strategy02">daily_strategy02</option>
-    </select>
-    <br>
 
-    {% comment %} detail info select {% endcomment %}
-    <label for="fee_rate">fee_rate: </label>
-    <input id="fee_rate" type="text" name="fee_rate">
-    <br>
-    <label for="tax_rate">tax_rate: </label>
-    <input id="tax_rate" type="text" name="tax_rate">    
-    <br>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://kit.fontawesome.com/dcc481b48a.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-    <input type="submit" value="OK">
-</form>
 
-{% if image_base64 %}
-    <img src="data:image/png;base64,{{image_base64}}" alt="No image" width=500 height=auto />
-{% endif %}
+  <!-- Bootstrap -->
+  {% comment %} {% static '/css/style.css' %} {% endcomment %}
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/jquery.bxslider.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/isotope.css' %}" media="screen" />
+  <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+  <link rel="stylesheet" href=" {% static 'js/fancybox/jquery.fancybox.css' %}" type="text/css" media="screen" />
+  <link href="{% static 'css/prettyPhoto.css' %}" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+  <title>index</title>
+
+</head>
+<body style="background-color:#ebfafa; background-image:url({% static 'images/7.png' %})">
+  <header>
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">
+      <div class="navigation">
+        <div class="container">
+          <div class="navbar-header">
+
+            <div class="navbar-brand">
+              <h1 style="color:#0059b3">wallet for Strategy</h1>
+            </div>
+          </div>
+    </nav>
+  </header>
+
+
+<div class="container" style="margin-left:150px">
+
+    <div class="container" style="width:40%; float:right; margin-top:200px">
+
+
+        <form action="" method="post">
+            {% csrf_token %}
+            <label for="strategy_field">Strategy: </label>
+
+            {% comment %} strategy select {% endcomment %}
+            <select name="strategy_field">
+                <option value=""></option>
+                <option value="daily_strategy01">daily_strategy01</option>
+                <option value="daily_strategy02">daily_strategy02</option>
+            </select>
+            <br>
+
+            {% comment %} detail info select {% endcomment %}
+            <label for="fee_rate">Fee rate: </label>
+            <input id="fee_rate" type="text" name="fee_rate">
+            <br>
+            <label for="tax_rate">Tax rate: </label>
+            <input id="tax_rate" type="text" name="tax_rate">    
+            <br>
+            <input class="bts btn-danger center-block" type="submit" value="OK">
+        </form>
+            {% if image_base64 %}
+                <h4>{{strategy_field}}적용시 (거래세율 - {{fee_rate}}% | {{tax_rate}}% )</h4>
+            {% endif %} 
+        </div>
+
+
+
+    <div class="container" style="width:60%; float:left; margin-top:100px">
+        {% if image_base64 %}
+            <img src="data:image/png;base64,{{image_base64}}" alt="No image" width=600 height=auto />
+        {% endif %} 
+    </div>
+
+
+
+</div>
+
+
+
+
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
+  <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'js/wow.min.js' %}"></script>
+  <script src="{% static 'js/fancybox/jquery.fancybox.pack.js' %}"></script>
+  <script src="{% static 'js/jquery.easing.1.3.js' %}"></script>
+  <script src="{% static 'js/jquery.bxslider.min.js' %}"></script>
+  <script src="{% static 'js/jquery.prettyPhoto.js' %}"></script>
+  <script src="{% static 'js/jquery.isotope.min.js' %}"></script>
+  <script src="{% static 'js/functions.js' %}"></script>
+  <script>
+    wow = new WOW({}).init();
+  </script>
+
+
+</div>
+</body>
+</html>
+
