@@ -48,7 +48,11 @@ def index(request):
             
     # ========================= Backtesting =========================
     def backtest(port_weight, deposit, buy='open', sell='open', asset_name='stock', fee_rate=0.00015, tax_rate=0.003):
-        
+        if request.method == "POST":
+            fee_rate = float(request.POST['fee_rate'])
+            tax_rate = float(request.POST['tax_rate'])
+
+    
         def _backtesting(row):
             t = row.name
             t_before = port_weight.index[list(port_weight.index).index(t)-1]
@@ -80,24 +84,12 @@ def index(request):
         port_weight.T.apply(lambda row: _backtesting(row))
         return invest
 
-    def pltToSvg(plt):
-        buf = io.BytesIO()
-        fig = plt.get_figure()
-        fig.savefig(buf, format='svg', bbox_inches='tight')
-        s = buf.getvalue()
-        buf.close()
-        return s
-
-    def get_svg(request, myplt):
-        svg = pltToSvg(myplt) # convert plot to SVG
-        myplt.cla() # clean up plt so it can be re-used
-        response = HttpResponse(svg, content_type='image/svg+xml')
-        return response
 
 
+    print('====================if POST========================')
     if request.method == "POST":
-        print('====================if POST========================')
-        # print(request.POST['strategy_field'])
+    
+        print(request.POST)
         invest_test = backtest(strategy_sample[request.POST['strategy_field']], 100000000)
     # invest_test.wallet.total.plot() 
 

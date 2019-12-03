@@ -1,8 +1,26 @@
 <form action="" method="post">
     {% csrf_token %}
-    <label for="strategy">Choose Strategy: </label>
-    <input id="strategy" type="text" name="strategy_field">
+    <label for="strategy_field">Choose Strategy: </label>
+
+    {% comment %} strategy select {% endcomment %}
+    <select name="strategy_field">
+        <option value=""></option>
+        <option value="daily_strategy01">daily_strategy01</option>
+        <option value="daily_strategy02">daily_strategy02</option>
+    </select>
+    <br>
+
+    {% comment %} detail info select {% endcomment %}
+    <label for="fee_rate">fee_rate: </label>
+    <input id="fee_rate" type="text" name="fee_rate">
+    <br>
+    <label for="tax_rate">tax_rate: </label>
+    <input id="tax_rate" type="text" name="tax_rate">    
+    <br>
+
     <input type="submit" value="OK">
 </form>
 
-<img src="data:image/png;base64,{{image_base64}}" alt="No image" width=500 height=auto />
+{% if image_base64 %}
+    <img src="data:image/png;base64,{{image_base64}}" alt="No image" width=500 height=auto />
+{% endif %}
