@@ -14,12 +14,13 @@ data_dir = str(setting['data_dir'])
 class PackInfo_DataGuide():
     market_open = None
     market_close = None
+
     class price_pack(Enum): # Price Related Pack
         directory = data_dir+'price_pack.pkl'
+        price = '수정주가(원)'
         price_open = '수정시가(원)'
         price_high = '수정고가(원)'
         price_low = '수정저가(원)'
-        price = '수정주가(원)'
         return_1w = '수익률 (1주)(%)'
         return_1m = '수익률 (1개월)(%)'
         return_3m = '수익률 (3개월)(%)'
@@ -34,19 +35,18 @@ class PackInfo_DataGuide():
         
     class market_pack(Enum): # Market Pack
         directory = data_dir+'market_pack.pkl'
-        kospi_open = '시가지수(포인트)'
-        kodaq_open = '시가지수(포인트)'
-        kospi_high = '고가지수(포인트)'
-        kodaq_high = '고가지수(포인트)'
-        kospi_low = '저가지수(포인트)'
-        kodaq_low = '저가지수(포인트)'
-        kospi = '종가지수(포인트)'
-        kodaq = '종가지수(포인트)'
-        kospi_trading_volume = '거래대금(원)' 
-        kodaq_trading_volume = '거래대금(원)'   
-        # market_open = None
-        
-    class liquidity_pack(Enum): # Supply and Demand Pack
+        kospi = ['코스피','종가지수(포인트)']
+        kospi_open = ['코스피','시가지수(포인트)']
+        kospi_high = ['코스피','고가지수(포인트)']
+        kospi_low = ['코스피','저가지수(포인트)']
+        kospi_trading_volume = ['코스피','거래대금(원)']
+        kosdaq = ['코스닥','종가지수(포인트)']
+        kosdaq_open = ['코스닥','시가지수(포인트)']
+        kosdaq_high = ['코스닥','고가지수(포인트)']
+        kosdaq_low = ['코스닥','저가지수(포인트)']
+        kosdaq_trading_volume = ['코스닥','거래대금(원)']
+
+    class liquidity_pack(Enum): # Liquidity Pack
         directory = data_dir+'liquidity_pack.pkl'
         inst_sell = '매도대금(기관계)(만원)'
         inst_buy = '매수대금(기관계)(만원)'
@@ -75,11 +75,9 @@ class DataGuideData(PackInfo_DataGuide):
         self.MD = None # Parsing 대상이 되는 전체 Raw Data - Market
         self.SDD = None # Parsing 대상이 되는 전체 Raw Data - Supply & Demand 
         self.QD = None # Parsing 대상이 되는 전체 Raw Data - Quality
-        # self.monthly_return = None
-        # self.monthly_return_ie = None
         self._read() # Read data 
         self._unpack() # Unpack files
-        # Market Open
+        # Market Open Data
         self.Pack.market_open = (self.Pack.market_pack.kospi.value).dropna().index
         self.Pack.market_close = pd.DatetimeIndex(np.setdiff1d((self.Pack.market_pack.kospi.value).index, self.Pack.market_open))
     
@@ -92,23 +90,20 @@ class DataGuideData(PackInfo_DataGuide):
         print('complete!!', time.time()-start, 'sec')
               
     def _unpack(self):
-        print('File unpacking... ', end='')
-        start = time.time()
+        print('File unpacking... ', end=''); start = time.time()
+        # MARKET DATA UNPACK        
+        for component in self.Pack.market_pack:
+            if component.name == 'directory': continue
+            component._value_ = self.market_data[component.value[0]][component.value[1]]
+            component._value_.name = component.name
         # PRICE RELATED DATA UNPACK
-        for i, component in enumerate(self.Pack.price_pack):
+        for component in self.Pack.price_pack:
             if component.name == 'directory': continue
-            component._value_ = self.price_data.xs(tuple(self.Pack.price_pack)[i].value, level=1, axis=1)
-
+            component._value_ = self.price_data.xs(component.value, level=1, axis=1)
         # SUPPLY&DEMAND UNPACK
-        for i, component in enumerate(self.Pack.liquidity_pack):
+        for component in self.Pack.liquidity_pack:
             if component.name == 'directory': continue
-            component._value_ = self.liquidity_data.xs(tuple(self.Pack.liquidity_pack)[i].value, level=1, axis=1)
-        
-        # MARKET DATA UNPACK
-        for i, component in enumerate(self.Pack.market_pack):
-            if component.name == 'directory': continue
-            mkt = '코스피' if component.name[:5] == 'kospi' else '코스닥'
-            component._value_ = (self.market_data[mkt])[tuple(self.Pack.market_pack)[i].value]
+            component._value_ = self.liquidity_data.xs(component.value, level=1, axis=1)
         print('complete', time.time()-start, 'sec')
         
     # Data integrity check    
