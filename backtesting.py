@@ -1,6 +1,26 @@
+'''
+backtesting.py
+    1) 거래비용(중개 수수료 및 세금)과 실제 주문가능 수량을 고려한 정교한 백테스팅 모듈
+    2) backtest(strategy, init_deposit, buy, sell, asset_name, fee_rate, tax_rate, test_from, test_to)
+        a. strategy     : 투자 유니버스를 칼럼으로 리벨런스 날짜를 인덱스, 종목별 비중을 데이터로 갖는 데이터프레임(pickle file)
+        b. init_deposit : 초기 투자금
+        c. buy          : 매수 기준 가격
+        d. sell         : 매도 기준 가격
+        e. asset_name   : 자산 이름 지정
+        f. fee_rate     : 기관 중개 수수료(매수 및 매도시 적용)
+        g. tax_rate     : 세금(매도시 적용)
+        h. test_from    : 백테스팅 기간 시작날짜(전략 파일 최초일과 동일하거나 이후여야 한다) ex. '2000-01-03'
+        i. test_to      : 백테스팅 기간 종료날짜(전략 파일 최종일과 동일하거나 이전이여야 한다) ex. '2019-10-31'
+    3) Return = (Class)Invest
+        a. Basic Information
+        b. Performance Information
+    4) Usage Example
+        a. from backtesting import *
+    Cf. 백테스팅 및 다른 모듈에서 활용성(이름에 대한 접근) 및 반복문 사용을 위해 Enum Class를 상속받아 만들어짐
+        따라서, pack.(target).name 및 pack.(target).value 로 접근해야하며 각각 이름과 데이터를 담고 있다.
+'''
+
 #%%
-from data_loading import pack
-from _setting import setting
 import os
 import pandas as pd
 import numpy as np
@@ -8,12 +28,14 @@ import time
 import random
 import ffn
 import matplotlib.pyplot as plt
+from data_loading import pack
+from _setting import setting
 
-sample_dir = setting['strategy_sample_dir']
+dir_sample = setting['dir_strategy_sample']
 strategy_sample = {}
-for target in os.listdir(sample_dir):
+for target in os.listdir(dir_sample):
     if target[-4:] == ".pkl":
-        strategy_sample[target[:-4]] = pd.read_pickle(sample_dir+target)
+        strategy_sample[target[:-4]] = pd.read_pickle(dir_sample+target)
 
 # ==================== User Define Functions ====================
 # Eliminate Unnecessary Parts of Large_df based on Small_df
@@ -43,6 +65,8 @@ class Investing:
         self.asset_name = name
         self.perf = Performance()
         self._tmp = None
+        self.buy_at = 'open'
+        self.sell_at = 'open'
         
     def activate(self, init_invest, dates, items):
         # 1) init_invest : 초기 투자금액
@@ -74,6 +98,8 @@ class Investing:
         print("\t\t Activate success!!")
     
     def expansion(self, estimate_price):
+        self.estimate_price = estimate_price
+
         # Generate Empty DataFrame for expansion
         plate_portfolio = pd.DataFrame(index=self.invest_period, columns=self.portfolio.columns)
         plate_wallet = pd.DataFrame(index=self.invest_period, columns=self.wallet.columns) 
@@ -92,7 +118,6 @@ class Investing:
         self.portfolio = (plate_portfolio.T.apply(lambda row: _expansion_portfolio(row))).T
         self.wallet = (plate_wallet.T.apply(lambda row: _expansion_wallet(row))).T
         self.wallet[self.asset_name] = (self.portfolio * estimate_price).sum(axis=1)
-        print("\t\t Expansion success!!")
 
     def performance(self):
         self._tmp = pd.concat([self.wallet.total, (pack.market_pack.kospi.value)[self.invest_period], (pack.market_pack.kosdaq.value)[self.invest_period]], axis=1)
@@ -107,7 +132,7 @@ class Investing:
 
         
 # ========================= Backtesting =========================
-def backtest(port_weight, deposit, buy='open', sell='open', asset_name='stock', fee_rate=0.00015, tax_rate=0.003, set_from=False, set_to=False):
+def backtest(port_weight, deposit, buy='open', sell='open', asset_name='stock', fee_rate=0.00015, tax_rate=0.003, test_from=False, test_to=False):
     # Input Arguments
     ## 1) Port_weight  : 전략에 따라 매 리밸런스기 보유해야할 종목 비중
     ## 2) deposit      : 최초 투자금액
@@ -116,11 +141,17 @@ def backtest(port_weight, deposit, buy='open', sell='open', asset_name='stock', 
     ## 5) fee_rate     : 기관 중개 수수료
     ## 6) tax_rate     : 세금
     
+    # port_weight을 직접 주어주지 않는경우(파일 이름을 주는 경우)
+    if type(port_weight)!=pd.core.frame.DataFrame:
+        print('Read strategy file from strategy folder... ', end='')
+        port_weight = pd.read_pickle(setting['dir_strategy']+port_weight)
+        print(' Complete!')
+
     # 백테스팅 범위 지정 - Out of Range에 대한 부분 차후 업데이트 필요
-    if set_from:
-        port_weight = port_weight.loc[set_from:]
-    if set_to:
-        port_weight = port_weight.loc[:set_to]
+    if test_from:
+        port_weight = port_weight.loc[test_from:]
+    if test_to:
+        port_weight = port_weight.loc[:test_to]
 
     # 고속 연산을 위한 내부 함수
     def _backtesting(row):
@@ -161,6 +192,7 @@ def backtest(port_weight, deposit, buy='open', sell='open', asset_name='stock', 
         invest.portfolio.loc[t] = curr_portfolio 
 
     # 투자 클래스 생성 및 활성화
+    print("\n\t\t ------------",asset_name,"------------")
     invest = Investing(asset_name)
     invest.activate(deposit, port_weight.index, port_weight.columns)
     
@@ -171,7 +203,7 @@ def backtest(port_weight, deposit, buy='open', sell='open', asset_name='stock', 
 
     # 투자 시뮬레이션
     port_weight.T.apply(lambda row: _backtesting(row))
-    print("\t\t Elaborate backtesting success!!")
+    print("\t\t Backtesting success!!")
 
     # 확장(리밸런스기 제외 평가금액 반영)
     invest.expansion(price_sell)
@@ -180,6 +212,7 @@ def backtest(port_weight, deposit, buy='open', sell='open', asset_name='stock', 
     # 투자성과 분석
     invest.performance()    
     print("\t\t Performance analysis success!!")
+    print("\t\t --------------- Generate!! ---------------")
 
     return invest
 
@@ -246,7 +279,7 @@ def backtest_daily(port_weight, deposit, buy='open', sell='open', asset_name='st
 
 
 # ======================= Sample Investment =======================
-sample_num = 2
+sample_num = 1
 sample_ord = list(range(0, sample_num)); random.shuffle(sample_ord)
 
 init_deposit = 100000000
@@ -255,11 +288,11 @@ invest_to = '2019-09-30'
 
 print('Sample investment generating...')
 print('\t Sample with cost')
-invest_samples = [backtest(strategy_sample[(list(strategy_sample.keys()))[i]], \
-    init_deposit, set_from=invest_from, set_to=invest_to) for i in sample_ord]
+invest_samples = [backtest(strategy_sample[list(strategy_sample.keys())[i]], init_deposit, asset_name=list(strategy_sample.keys())[i], \
+    test_from=invest_from, test_to=invest_to) for i in sample_ord]
 print('\t success! \n\n\t Sample without cost')
-invest_samples_nc = [backtest(strategy_sample[(list(strategy_sample.keys()))[i]], \
-    init_deposit,fee_rate=0., tax_rate=0., set_from=invest_from, set_to=invest_to) for i in sample_ord]
+invest_samples_nc = [backtest(strategy_sample[list(strategy_sample.keys())[i]], init_deposit, asset_name=list(strategy_sample.keys())[i], \
+    test_from=invest_from, test_to=invest_to, fee_rate=0., tax_rate=0.) for i in sample_ord]
 print('\t success!')
 
 
@@ -267,11 +300,6 @@ print('\t success!')
 if __name__ == "__main__":
     pass
     # print("\n--------------------------------------- backtesting.py test ---------------------------------------")
-    #print("Generate 2 sample investment\n")
-
-    # no_cost = backtest(strategy_sample['daily_strategy01'], 100000000, fee_rate=0., tax_rate=0., asset_name='test_WithOutCost', set_from='2019-01-01', set_to='2019-09-30')
-    # yes_cost = backtest(strategy_sample['daily_strategy01'], 100000000, asset_name='test_WithCost', set_from='2019-01-01', set_to='2019-09-30')
-    
     # print("\n--------------------------------------------- Success! ---------------------------------------------", end='\n\n')
     
 

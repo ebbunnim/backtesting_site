@@ -1,3 +1,19 @@
+'''
+data_loading.py
+    1) 백테스팅 및 어드바이저에 필요한 데이터를 규격화시켜준다
+    2) dir_data 에서 pkl(혹은 hdf)파일을 읽어와 필요한 형태로 파싱한다.
+    3) Return = (Class)pack
+        a. pack.price_pack     : 가격 관련 데이터 팩
+        b. pack.market_pack    : 마켓 관련 데이터 팩
+        c. pack.liquidity_pack : 수급 관련 데이터 팩
+    4) Usage Example
+        a. pack.price_pack.price.value : 수정주가
+        b. pack.price_pack.open.value  : 수정시가
+        c. pack.market_pack.kosdaq     : 코스닥
+    Cf. 백테스팅 및 다른 모듈에서 활용성(이름에 대한 접근) 및 반복문 사용을 위해 Enum Class를 상속받아 만들어짐
+        따라서, pack.(target).name 및 pack.(target).value 로 접근해야하며 각각 이름과 데이터를 담고 있다.
+'''
+
 #%%
 from _setting import setting
 import pandas as pd
@@ -5,9 +21,8 @@ import numpy as np
 import time
 from enum import Enum
 
-
 # ==================== Read the Data Directory ====================
-data_dir = str(setting['data_dir'])
+_dir = str(setting['dir_data'])
     
     
 # ====================== Data Pack Structure ======================
@@ -16,7 +31,7 @@ class PackInfo_DataGuide():
     market_close = None
 
     class price_pack(Enum): # Price Related Pack
-        directory = data_dir+'price_pack.pkl'
+        directory = _dir+'price_pack.pkl'
         price = '수정주가(원)'
         price_open = '수정시가(원)'
         price_high = '수정고가(원)'
@@ -34,7 +49,7 @@ class PackInfo_DataGuide():
         vold_52w = '변동성 (52주)'
         
     class market_pack(Enum): # Market Pack
-        directory = data_dir+'market_pack.pkl'
+        directory = _dir+'market_pack.pkl'
         kospi = ['코스피','종가지수(포인트)']
         kospi_open = ['코스피','시가지수(포인트)']
         kospi_high = ['코스피','고가지수(포인트)']
@@ -45,9 +60,10 @@ class PackInfo_DataGuide():
         kosdaq_high = ['코스닥','고가지수(포인트)']
         kosdaq_low = ['코스닥','저가지수(포인트)']
         kosdaq_trading_volume = ['코스닥','거래대금(원)']
+        
 
     class liquidity_pack(Enum): # Liquidity Pack
-        directory = data_dir+'liquidity_pack.pkl'
+        directory = _dir+'liquidity_pack.pkl'
         inst_sell = '매도대금(기관계)(만원)'
         inst_buy = '매수대금(기관계)(만원)'
         inst = '순매수대금(기관계)(만원)'
@@ -87,7 +103,7 @@ class DataGuideData(PackInfo_DataGuide):
         self.price_data = pd.read_pickle(self.Pack.price_pack.directory.value)
         self.market_data = pd.read_pickle(self.Pack.market_pack.directory.value)
         self.liquidity_data = pd.read_pickle(self.Pack.liquidity_pack.directory.value)
-        print('complete!!', time.time()-start, 'sec')
+        print('complete!! %.5f sec.' %(time.time()-start))
               
     def _unpack(self):
         print('File unpacking... ', end=''); start = time.time()
@@ -104,7 +120,7 @@ class DataGuideData(PackInfo_DataGuide):
         for component in self.Pack.liquidity_pack:
             if component.name == 'directory': continue
             component._value_ = self.liquidity_data.xs(component.value, level=1, axis=1)
-        print('complete', time.time()-start, 'sec')
+        print('complete!! %.5f sec.' %(time.time()-start))
         
     # Data integrity check    
     def _updateData(self):
@@ -122,7 +138,7 @@ if __name__ == "__main__":
     print("data_loading test...")
     print(pack.market_open)
     print("Complete!!")
-    print("--------------------------------------- No problem!!!!!!!!!! ---------------------------------------", end='\n\n')
+    print("--------------------------------------------- Success! ---------------------------------------------", end='\n\n')
 
 
 # %%
