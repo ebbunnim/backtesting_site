@@ -1,3 +1,5 @@
-base_dir = /Users/sinjiyoung/Documents/
-data_dir = /Users/sinjiyoung/Documents/django-finance/elaborate_backtesting/
-strategy_sample_dir = /Users/sinjiyoung/Documents/django-finance/elaborate_backtesting/strategy_sample/
+# Directory Information
+dir_package = 
+dir_data = 
+dir_strategy = 
+dir_strategy_sample = 

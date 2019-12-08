@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}
+strategy
+{% endblock title %}
+
+{% block body %}
+
+<div class="list-group">
+
+  <a href="#" class="list-group-item list-group-item-action">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">Sample01</h5>
+    </div>
+    <ul>
+      <li>Daily Trading Example 01</li>
+      <li>Condition : 1 < (종가-시가)/(고가-저가) < 1.1</li>
+      <li>Trading : 조건충족 다음날 시가매수 및 종가매도</li>
+      <li>Weight : Condition 비중</li>
+    </ul>
+  </a>
+
+  <a href="#" class="list-group-item list-group-item-action">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">Sample02</h5>
+    </div>
+    <ul>
+      <li>Daily Trading Example 02</li>
+      <li>Condition : 0 < (종가-시가)/(고가-저가) < 1.1</li>
+      <li>Trading : 조건충족 다음날 시가매수 및 종가매도</li>
+      <li>Weight : log(Condition) 비중</li>
+    </ul>
+  </a>
+
+  <a href="#" class="list-group-item list-group-item-action">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">qvm_sd_6121</h5>
+    </div>
+    <ul>
+      <li>Quality Value Momentum & Supply-Demand Strategy</li>
+      <li>Condition 
+      <ol>
+      <li>Quality Factor
+      <ul>
+      <li>SE of Exponential Growth Curve</li>
+      <li>SHB</li>
+      <li>ROA</li>
+      </ul>
+      </li>
+      <li>Value Factor
+      <ul>
+      <li>ROE</li>
+      </ul>
+      </li>
+      <li>Momentum Factor
+      <ul>
+      <li>Short-term Weight Momentum</li>
+      <li>Long-term Weight Momentum</li>
+      <li>Momentum</li>
+      </ul>
+      </li>
+      <li>SupplyDemand Factor</li>
+      </ol>
+      </li>
+      <li>Trading : 월초(거래가능일) 시가 매도 및 매수</li>
+      <li>Weight : Equal Weight</li>
+    </ul>
+  </a>
+
+  <a href="#" class="list-group-item list-group-item-action">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">qvm_sd_7121</h5>
+    </div>
+    <ul>
+      <li>Quality Value Momentum & Supply-Demand Strategy</li>
+      <li>Condition 
+      <ol>
+      <li>Quality Factor
+      <ul>
+      <li>SE of Exponential Growth Curve</li>
+      <li>SHB</li>
+      <li>ROA</li>
+      </ul>
+      </li>
+      <li>Value Factor
+      <ul>
+      <li>ROE</li>
+      </ul>
+      </li>
+      <li>Momentum Factor
+      <ul>
+      <li>Short-term Weight Momentum</li>
+      <li>Long-term Weight Momentum</li>
+      <li>Momentum</li>
+      </ul>
+      </li>
+      <li>SupplyDemand Factor</li>
+      </ol>
+      </li>
+      <li>Trading : 월초(거래가능일) 시가 매도 및 매수</li>
+      <li>Weight : Equal Weight</li>
+    </ul>
+  </a>
+
+
+  <a href="#" class="list-group-item list-group-item-action">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">qvm_sd_8121</h5>
+    </div>
+    <ul>
+      <li>Quality Value Momentum & Supply-Demand Strategy</li>
+      <li>Condition 
+      <ol>
+      <li>Quality Factor
+      <ul>
+      <li>SE of Exponential Growth Curve</li>
+      <li>SHB</li>
+      <li>ROA</li>
+      </ul>
+      </li>
+      <li>Value Factor
+      <ul>
+      <li>ROE</li>
+      </ul>
+      </li>
+      <li>Momentum Factor
+      <ul>
+      <li>Short-term Weight Momentum</li>
+      <li>Long-term Weight Momentum</li>
+      <li>Momentum</li>
+      </ul>
+      </li>
+      <li>SupplyDemand Factor</li>
+      </ol>
+      </li>
+      <li>Trading : 월초(거래가능일) 시가 매도 및 매수</li>
+      <li>Weight : Equal Weight</li>
+    </ul>
+  </a>
+
+</div>
+
+{% endblock body %}

@@ -31,11 +31,16 @@ import matplotlib.pyplot as plt
 from data_loading import pack
 from _setting import setting
 
+
+
+# =================== Strategy Sample Loading ===================
 dir_sample = setting['dir_strategy_sample']
 strategy_sample = {}
 for target in os.listdir(dir_sample):
     if target[-4:] == ".pkl":
         strategy_sample[target[:-4]] = pd.read_pickle(dir_sample+target)
+
+
 
 # ==================== User Define Functions ====================
 # Eliminate Unnecessary Parts of Large_df based on Small_df
@@ -49,6 +54,7 @@ def plate(df):
 # Return emarket_packty Series
 def stick(df, stick_name=None):
     return pd.Series(index=df.index, name=stick_name)
+
 
 
 # ======================= Investing Class =======================
@@ -131,8 +137,11 @@ class Investing:
         # benchmark = {'kospi':pack.market_pack.kospi[self.invest_period], 'kosdaq':pack.market_pack.kosdaq[self.invest_period]}
 
         
+
 # ========================= Backtesting =========================
-def backtest(port_weight, deposit, buy='open', sell='open', asset_name='stock', fee_rate=0.00015, tax_rate=0.003, test_from=False, test_to=False):
+def backtest(port_weight, deposit, buy='open', sell='open', asset_name='stock', fee_rate=0.00015, tax_rate=0.003, test_from=False, test_to=False, _massage=''):
+    print('* Backtesting - Invest class generating')
+    print(_massage, end='')
     # Input Arguments
     ## 1) Port_weight  : 전략에 따라 매 리밸런스기 보유해야할 종목 비중
     ## 2) deposit      : 최초 투자금액
@@ -143,9 +152,11 @@ def backtest(port_weight, deposit, buy='open', sell='open', asset_name='stock', 
     
     # port_weight을 직접 주어주지 않는경우(파일 이름을 주는 경우)
     if type(port_weight)!=pd.core.frame.DataFrame:
-        print('Read strategy file from strategy folder... ', end='')
+        asset_name = port_weight[:-4]
+        print('\t',port_weight,'is external file!')
+        print('\t Attempting to read', port_weight,'in strategy folder... ', end='')
         port_weight = pd.read_pickle(setting['dir_strategy']+port_weight)
-        print(' Complete!')
+        print(' Success!')
 
     # 백테스팅 범위 지정 - Out of Range에 대한 부분 차후 업데이트 필요
     if test_from:
@@ -212,7 +223,7 @@ def backtest(port_weight, deposit, buy='open', sell='open', asset_name='stock', 
     # 투자성과 분석
     invest.performance()    
     print("\t\t Performance analysis success!!")
-    print("\t\t --------------- Generate!! ---------------")
+    print("\t\t --------------- Generate!! ---------------\n")
 
     return invest
 
@@ -286,14 +297,10 @@ init_deposit = 100000000
 invest_from = '2019-01-01'
 invest_to = '2019-09-30'
 
-print('Sample investment generating...')
-print('\t Sample with cost')
 invest_samples = [backtest(strategy_sample[list(strategy_sample.keys())[i]], init_deposit, asset_name=list(strategy_sample.keys())[i], \
-    test_from=invest_from, test_to=invest_to) for i in sample_ord]
-print('\t success! \n\n\t Sample without cost')
+    test_from=invest_from, test_to=invest_to, _massage='\t Sample investment generating\n\t\t Sample with cost') for i in sample_ord]
 invest_samples_nc = [backtest(strategy_sample[list(strategy_sample.keys())[i]], init_deposit, asset_name=list(strategy_sample.keys())[i], \
-    test_from=invest_from, test_to=invest_to, fee_rate=0., tax_rate=0.) for i in sample_ord]
-print('\t success!')
+    test_from=invest_from, test_to=invest_to, fee_rate=0., tax_rate=0., _massage='\t Sample investment generating\n\t\t Sample without cost') for i in sample_ord]
 
 
 # ===================== __name__=="__main__" ======================

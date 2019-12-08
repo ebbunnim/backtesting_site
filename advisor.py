@@ -10,6 +10,10 @@ advisor.py
 #%%
 from backtesting import *
 import pandas as pd
+import numpy as np
+
+def purify_series(series, name):
+    return pd.Series(np.array(series), name=name)
 
 class RebalanceAnalysis:
     def __init__(self, invest, benchmark, check_gap):
@@ -41,14 +45,17 @@ class RebalanceAnalysis:
         rebal_perf_rel = rebal_perf - rebal_perf_benchmark # 투자전략의 리벨런스기 벤치마크 대비 가치
         rebal_perf_item_rel = rebal_perf_item.sub(rebal_perf, axis=0) # 투자전략의 종목별 리밸런스기 벤치마크 대비 가치
 
+        
+
         # 벤치마크 대비 성과기준 out-perform / under-perform
         self.win_dates = (rebal_perf_rel[rebal_perf_rel>check_gap].dropna()).index
         self.lose_dates = (rebal_perf_rel[rebal_perf_rel<-check_gap].dropna()).index
 
-        # 리벨런스 성과 정보 테이블
-        self.performance = pd.concat([pd.Series(rebal_perf.index[:-1]), pd.Series(rebal_perf.index[1:]), rebal_perf[:-1], rebal_perf_rel[:-1], rebal_perf_benchmark[:-1]],\
-             axis=1, ignore_index=True)
-        # names=['rebalance_date', 'exit_date', 'return', 'relative_return', 'benchmark'])
+
+        # 리밸런스 테이블 요소
+        comp = [purify_series(rebal_perf.index[:-1],'rebalance_date'), purify_series(rebal_perf.index[1:],'exit_date'), \
+            purify_series(rebal_perf[:-1],'return'), purify_series(rebal_perf_rel[:-1],'relative_return'), purify_series(rebal_perf_benchmark[:-1],'benchmark')]        
+        self.performance = pd.concat(comp, axis=1, ignore_index=True)
         self.win = self.performance.loc[self.win_dates]
         self.lose = self.performance.loc[self.lose_dates]
 
@@ -80,6 +87,7 @@ adv_nc = Advisor(invest_samples_nc[0])
 adv_c = Advisor(invest_samples[0])
 adv_nc.activate()
 adv_c.activate()
+r = adv_nc.rebal
 
 if __name__ == "__main__":
     print("\n--------------------------------------- data_loading.py test ---------------------------------------")

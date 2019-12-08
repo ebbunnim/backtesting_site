@@ -84,6 +84,7 @@ class PackInfo_DataGuide():
 # ====================== Construct Data Pack ======================
 class DataGuideData(PackInfo_DataGuide):    
     def __init__(self):
+        print('* Data Loading')
         # Pack Data - PRP, MP, SDP, QP
         # self.PackInfo = PackInfo_DataGuide() # Pack 구성 정보를 담을 Pack Information Set
         self.Pack = PackInfo_DataGuide() # Pack 구성 정보를 바탕으로 개별 데이터가 저장될 Data Set
@@ -98,15 +99,15 @@ class DataGuideData(PackInfo_DataGuide):
         self.Pack.market_close = pd.DatetimeIndex(np.setdiff1d((self.Pack.market_pack.kospi.value).index, self.Pack.market_open))
     
     def _read(self):
-        print('File loading... ', end='')
+        print('\t File loading... ', end='')
         start = time.time()
         self.price_data = pd.read_pickle(self.Pack.price_pack.directory.value)
         self.market_data = pd.read_pickle(self.Pack.market_pack.directory.value)
         self.liquidity_data = pd.read_pickle(self.Pack.liquidity_pack.directory.value)
-        print('complete!! %.5f sec.' %(time.time()-start))
+        print(' complete!! %.5f sec.' %(time.time()-start))
               
     def _unpack(self):
-        print('File unpacking... ', end=''); start = time.time()
+        print('\t File unpacking... ', end=''); start = time.time()
         # MARKET DATA UNPACK        
         for component in self.Pack.market_pack:
             if component.name == 'directory': continue
@@ -120,7 +121,7 @@ class DataGuideData(PackInfo_DataGuide):
         for component in self.Pack.liquidity_pack:
             if component.name == 'directory': continue
             component._value_ = self.liquidity_data.xs(component.value, level=1, axis=1)
-        print('complete!! %.5f sec.' %(time.time()-start))
+        print(' complete!! %.5f sec.\n' %(time.time()-start))
         
     # Data integrity check    
     def _updateData(self):
